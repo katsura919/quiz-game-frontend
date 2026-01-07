@@ -54,6 +54,23 @@ export default function CreateRoomPage() {
 
   const handleGameCreated = (data: { roomCode: string; game: any }) => {
     console.log("Game created:", data);
+
+    // Get host info from localStorage
+    const hostId = localStorage.getItem("hostId");
+    const hostName = localStorage.getItem("hostName");
+
+    if (!hostId || !hostName) return;
+
+    // Join as a player
+    socket.emit("join-game", {
+      roomCode: data.roomCode,
+      player: {
+        id: hostId,
+        name: hostName,
+        score: 0,
+      },
+    });
+
     // Navigate to host waiting room
     router.push(`/host/${data.roomCode}`);
   };

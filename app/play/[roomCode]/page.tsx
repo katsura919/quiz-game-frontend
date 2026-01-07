@@ -105,7 +105,7 @@ export default function PlayerWaitingRoom() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-600 p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-600 via-blue-600 to-cyan-600 p-4">
       <div className="max-w-4xl mx-auto py-8">
         {/* Room Info Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 mb-6">
@@ -116,7 +116,7 @@ export default function PlayerWaitingRoom() {
             <p className="text-gray-600">The host will start the game soon</p>
           </div>
 
-          <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-2xl p-6 mb-6">
+          <div className="bg-linear-to-r from-purple-100 to-blue-100 rounded-2xl p-6 mb-6">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-2">Room Code</p>
               <div className="text-4xl font-bold text-purple-900 tracking-wider mb-3">
@@ -132,7 +132,7 @@ export default function PlayerWaitingRoom() {
           {/* Your Info */}
           <div className="bg-blue-50 rounded-lg p-4 mb-6 border-2 border-blue-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                 {playerName.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1">
@@ -167,9 +167,9 @@ export default function PlayerWaitingRoom() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Host Card (if we can identify them) */}
             {game?.hostId && (
-              <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-4 border-2 border-yellow-300">
+              <div className="bg-linear-to-br from-yellow-50 to-orange-50 rounded-lg p-4 border-2 border-yellow-300">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="w-12 h-12 bg-linear-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                     H
                   </div>
                   <div className="flex-1">
@@ -191,16 +191,16 @@ export default function PlayerWaitingRoom() {
                   key={player.id}
                   className={`rounded-lg p-4 border-2 ${
                     isCurrentPlayer
-                      ? "bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-300"
-                      : "bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200"
+                      ? "bg-linear-to-br from-blue-50 to-cyan-50 border-blue-300"
+                      : "bg-linear-to-br from-purple-50 to-blue-50 border-purple-200"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${
                         isCurrentPlayer
-                          ? "bg-gradient-to-br from-blue-500 to-cyan-500"
-                          : "bg-gradient-to-br from-purple-500 to-blue-500"
+                          ? "bg-linear-to-br from-blue-500 to-cyan-500"
+                          : "bg-linear-to-br from-purple-500 to-blue-500"
                       }`}
                     >
                       {player.avatar || player.name.charAt(0).toUpperCase()}

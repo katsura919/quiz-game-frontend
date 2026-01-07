@@ -69,7 +69,7 @@ export default function HostWaitingRoom() {
   const handleGameStarted = (data: { game: any; question: any }) => {
     console.log("Game started:", data);
     // Navigate to game screen
-    router.push(`/host/${roomCode}/game`);
+    router.push(`/play/${roomCode}/game`);
   };
 
   const handleError = (error: { message: string }) => {
