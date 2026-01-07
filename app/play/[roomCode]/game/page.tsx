@@ -36,7 +36,8 @@ export default function PlayerGamePage() {
   const [playerName, setPlayerName] = useState<string>("");
 
   useEffect(() => {
-    const storedPlayerName = localStorage.getItem("playerName");
+    const storedPlayerName =
+      localStorage.getItem("playerName") || localStorage.getItem("hostName");
     if (!storedPlayerName) {
       router.push(`/join/${roomCode}`);
       return;
@@ -45,11 +46,59 @@ export default function PlayerGamePage() {
   }, [roomCode, router]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.log("Socket not available");
+      return;
+    }
+
+    console.log("Setting up socket listeners for room:", roomCode);
+    console.log("Socket connected:", socket.connected);
+    console.log("Current socket ID:", socket.id);
+
+    // Ensure we're in the room (re-join if needed)
+    const playerId =
+      localStorage.getItem("playerId") || localStorage.getItem("hostId");
+    const playerName =
+      localStorage.getItem("playerName") || localStorage.getItem("hostName");
+
+    if (playerId && playerName) {
+      console.log("Ensuring player is in room:", {
+        roomCode,
+        playerId,
+        playerName,
+      });
+      // Request current game state since we might have missed the game-started event
+      socket.emit("get-current-question", { roomCode, playerId });
+    }
+
+    // Listen for current question response
+    socket.on("current-question", (data: any) => {
+      console.log("Received current-question:", data);
+      if (data && data.question) {
+        const questionData = data.question;
+        setCurrentQuestion({
+          id: questionData.id,
+          question: questionData.question,
+          answers: questionData.answers,
+          correctAnswer: questionData.correctAnswer,
+          timeLimit: questionData.timeLimit,
+        });
+        setQuestionNumber(questionData.questionNumber);
+        setTotalQuestions(questionData.totalQuestions);
+        setTimeLeft(questionData.timeLimit || 30);
+        setSelectedAnswer(null);
+        setHasSubmitted(false);
+        setIsCorrect(null);
+      }
+    });
 
     // Listen for game started (first question)
     socket.on("game-started", (data: any) => {
       console.log("Received game-started:", data);
+      if (!data || !data.question) {
+        console.error("Invalid game-started data:", data);
+        return;
+      }
       const questionData = data.question;
       setCurrentQuestion({
         id: questionData.id,
@@ -103,6 +152,7 @@ export default function PlayerGamePage() {
     });
 
     return () => {
+      socket.off("current-question");
       socket.off("game-started");
       socket.off("next-question");
       socket.off("answer-result");
@@ -113,13 +163,11 @@ export default function PlayerGamePage() {
 
   // Timer countdown
   useEffect(() => {
-    if (timeLeft <= 0 || hasSubmitted) return;
+    if (timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1 && !hasSubmitted) {
-          // Auto-submit when time runs out
-          handleSubmitAnswer();
+        if (prev <= 1) {
           return 0;
         }
         return prev - 1;
@@ -131,27 +179,25 @@ export default function PlayerGamePage() {
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (hasSubmitted) return;
+
     setSelectedAnswer(answerIndex);
-  };
-
-  const handleSubmitAnswer = () => {
-    if (hasSubmitted) return;
-
-    const playerId = localStorage.getItem("playerId");
-    if (!socket || !playerId) return;
-
     setHasSubmitted(true);
 
+    const playerId =
+      localStorage.getItem("playerId") || localStorage.getItem("hostId");
+    if (!socket || !playerId) return;
+
+    // Auto-submit immediately
     socket.emit("submit-answer", {
       roomCode,
       playerId,
-      answerIndex: selectedAnswer ?? -1, // -1 if no answer selected
+      answerIndex: answerIndex,
     });
   };
 
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen bg-linearr-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-600 to-blue-600 flex items-center justify-center">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-xl">Waiting for next question...</p>
@@ -262,19 +308,6 @@ export default function PlayerGamePage() {
           </div>
         </div>
 
-        {/* Submit Button */}
-        {!hasSubmitted && (
-          <div className="flex justify-center">
-            <Button
-              onClick={handleSubmitAnswer}
-              disabled={selectedAnswer === null}
-              className="bg-green-500 hover:bg-green-600 text-white px-12 py-6 text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Submit Answer
-            </Button>
-          </div>
-        )}
-
         {/* Result Message */}
         {hasSubmitted && isCorrect !== null && (
           <div className="text-center">
@@ -287,6 +320,14 @@ export default function PlayerGamePage() {
             </div>
             <p className="text-white mt-4 text-lg">
               Waiting for next question...
+            </p>
+          </div>
+        )}
+
+        {hasSubmitted && isCorrect === null && (
+          <div className="text-center">
+            <p className="text-white text-lg">
+              Answer submitted! Waiting for results...
             </p>
           </div>
         )}
