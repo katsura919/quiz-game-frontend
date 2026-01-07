@@ -1,16 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { AuthDialog } from "@/components/auth-dialog";
 
 export default function Home() {
   const router = useRouter();
-  const [roomCode, setRoomCode] = useState('');
+  const [roomCode, setRoomCode] = useState("");
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   const handleCreateGame = () => {
-    router.push('/host');
+    router.push("/host");
   };
 
   const handleJoinGame = () => {
@@ -20,21 +22,30 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-600">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-600 via-blue-600 to-cyan-600">
+      {/* Sign In Button */}
+      <div className="absolute top-4 right-4">
+        <Button
+          onClick={() => setAuthDialogOpen(true)}
+          variant="outline"
+          className="bg-white/90 hover:bg-white"
+        >
+          🔐 Admin Sign In
+        </Button>
+      </div>
+
       <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             🧠 Quiz Party
           </h1>
-          <p className="text-gray-600">
-            Real-time multiplayer trivia game
-          </p>
+          <p className="text-gray-600">Real-time multiplayer trivia game</p>
         </div>
 
         <div className="space-y-4">
           <Button
             onClick={handleCreateGame}
-            className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            className="w-full h-14 text-lg font-semibold bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
           >
             🎮 Host a Game
           </Button>
@@ -73,32 +84,8 @@ export default function Home() {
           <p>No registration required</p>
         </div>
       </div>
-    </div>
-  );
-}
-            </Button>
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 }
