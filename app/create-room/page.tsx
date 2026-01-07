@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { triviaApi  } from "@/api/trivia";
+import { Input } from "@/components/ui/input";
+import { triviaApi } from "@/api/trivia";
 import { TriviaSet } from "@/types/trivia";
 import socket from "@/lib/socket";
 
@@ -12,6 +13,7 @@ export default function CreateRoomPage() {
   const [triviaSets, setTriviaSets] = useState<TriviaSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTriviaSet, setSelectedTriviaSet] = useState<string>("");
+  const [hostName, setHostName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
 
@@ -62,6 +64,11 @@ export default function CreateRoomPage() {
   };
 
   const handleCreateRoom = () => {
+    if (!hostName.trim()) {
+      setError("Please enter your name");
+      return;
+    }
+
     if (!selectedTriviaSet) {
       setError("Please select a trivia set");
       return;
@@ -97,8 +104,9 @@ export default function CreateRoomPage() {
       questions,
     });
 
-    // Store host ID in localStorage
+    // Store host data in localStorage
     localStorage.setItem("hostId", hostId);
+    localStorage.setItem("hostName", hostName.trim());
   };
 
   if (loading) {
@@ -142,6 +150,21 @@ export default function CreateRoomPage() {
             </div>
           ) : (
             <>
+              {/* Host Name Input */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Name
+                </label>
+                <Input
+                  value={hostName}
+                  onChange={(e) => setHostName(e.target.value)}
+                  placeholder="Enter your name"
+                  maxLength={20}
+                  disabled={creating}
+                  className="text-lg"
+                />
+              </div>
+
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Select Trivia Set
@@ -218,7 +241,7 @@ export default function CreateRoomPage() {
                 <Button
                   onClick={handleCreateRoom}
                   className="flex-1 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                  disabled={!selectedTriviaSet || creating}
+                  disabled={!selectedTriviaSet || !hostName.trim() || creating}
                 >
                   {creating ? "Creating Room..." : "Create Room"}
                 </Button>

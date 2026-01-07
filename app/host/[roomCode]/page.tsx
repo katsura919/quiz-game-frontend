@@ -19,16 +19,20 @@ export default function HostWaitingRoom() {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [hostId, setHostId] = useState("");
+  const [hostName, setHostName] = useState("");
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
-    // Get host ID from localStorage
+    // Get host data from localStorage
     const storedHostId = localStorage.getItem("hostId");
-    if (storedHostId) {
+    const storedHostName = localStorage.getItem("hostName");
+
+    if (storedHostId && storedHostName) {
       setHostId(storedHostId);
+      setHostName(storedHostName);
     } else {
-      // If no host ID, redirect to home
+      // If no host data, redirect to home
       router.push("/");
       return;
     }
@@ -103,7 +107,7 @@ export default function HostWaitingRoom() {
 
   const shareUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/host/${roomCode}`
+      ? `${window.location.origin}/join/${roomCode}`
       : "";
 
   return (
@@ -175,7 +179,7 @@ export default function HostWaitingRoom() {
               className="flex-1 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               disabled={players.length === 0 || starting}
             >
-              {starting ? "Starting..." : `Start Game (${players.length})`}
+              {starting ? "Starting..." : `Start Game (${players.length + 1})`}
             </Button>
           </div>
         </div>
