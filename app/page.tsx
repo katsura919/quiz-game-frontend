@@ -12,7 +12,7 @@ export default function Home() {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   const handleCreateGame = () => {
-    router.push("/host");
+    router.push("/create-room");
   };
 
   const handleJoinGame = () => {
